@@ -2,10 +2,9 @@ from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 import cloudscraper
 
-
 """
     File name: aa_webscrapping_function.py
-    Description: This file contains functions to scrap data from a given url
+    Description: This file contains functions to scrap data
 """
 
 

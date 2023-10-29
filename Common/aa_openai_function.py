@@ -42,7 +42,7 @@ def openai_request(content, role="system", model="gpt-3.5-turbo", temperature=0,
         )
         chatgpt_content = ""
         if(len(response['choices']) > 0):
-            chatgpt_content = response['choices'][0]['message']['content']
+            chatgpt_content = str(response['choices'][0]['message']['content']).replace("'", "''")
         return chatgpt_content
     except Exception as e:
         print(e)
@@ -56,7 +56,7 @@ def openai_request(content, role="system", model="gpt-3.5-turbo", temperature=0,
     Return:
         response: string
 """
-def resume_article_chatgpt(article):
+def article_to_tweet_chatgpt(article):
     try:
         return openai_request(content="Fait un tweet percutent a partir de l'article suivant, ne met pas de \" au tweet : \n" + article)
     except Exception as e:
@@ -73,7 +73,23 @@ def resume_article_chatgpt(article):
 """
 def article_category_chatgpt(article):
     try:
-        return openai_request(article + "\n\nclassifie le tweet dans un de ces types\n\nConflits internationaux\nRelations diplomatiques\nÉlections à l'échelle mondiale\n\n\n\nMarchés boursiers\nCryptomonnaies\nEmploi et chômage\nEntrepreneuriat et startups\n\n\n\nAvancées médicales\nNouvelles technologies\nEspace et astronomie\nIntelligence artificielle\n\n\n\nChangements climatiques\nConservation de la nature\nÉnergies renouvelables\nPollution\n\n\n\nDiversité culturelle\nMouvements sociaux\nÉvolutions des normes sociales\n\n\n\nMaladies émergentes\nSoins de santé mentale\nRecherche médicale\n\n\n\nRéformes éducatives\nTechnologies éducatives\nEnseignement à distance\n\n\n\nSorties cinématographiques\nNouveaux albums et concerts\nÉvénements artistiques\n\n\n\nRésultats de matchs\nTransferts de joueurs\nÉvénements sportifs majeurs\n\n\n\nCrimes \nÉvénements extraordinaires\nMystères non résolus\n\nRetourne juste le type en réponse")
+        return openai_request(article + "\n\nclassifie le tweet dans un de ces types: actualités nationales et internationales, économie, culture, science, sports, environnement , faits divers, santé, technologie, politique. Retourne juste le type en réponse")
     except Exception as e:
         print(e)
         return e
+    
+"""
+    Description:
+        Use chatgpt to generate a question from a given article
+    Parameters:
+        article: string
+    Return:
+        response: string
+"""
+def article_question_chatgpt(article):
+    try:
+        return openai_request("Pose une question ouverte sur le tweet suivant : \n\n" + article)
+    except Exception as e:
+        print(e)
+        return e
+    

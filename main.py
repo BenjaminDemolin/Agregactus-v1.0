@@ -1,66 +1,69 @@
-import Common.aa_webscrapping_function as aawebf
+from dotenv import dotenv_values
+import Database.aa_local_database_function as localdb_f
+import Webscrapping.aa_webscrapping_news_function as webscrapping_f
+import Common.aa_mail_function as mail_f
 
-# URL = "https://fr.investing.com/news/latest-news"
+secret = dotenv_values(".env")
 
-# #print(aawebf.get_articles_links(URL,"article",True))
+def verify_database():
+    if(localdb_f.table_websites_exists() == False):
+        localdb_f.create_websites_table()
+    if(localdb_f.table_main_category_exists() == False):
+        localdb_f.create_main_category_table()
+    if(localdb_f.table_news_exists() == False):
+        localdb_f.create_news_table()
+    if(len(localdb_f.get_all_websites()) == 0):
+        localdb_f.init_websites_table()
 
-# URL = "https://www.france24.com/fr/info-en-continu/"
+def format_tweet(tweet, source):
+    return tweet + "\n(source : " + source + ")"
 
-# print(aawebf.get_articles_links(URL,".news__content"))
-
-# URL = "https://www.france24.com/fr/info-en-continu/20230906-wall-street-termine-en-baisse-prises-de-b%C3%A9n%C3%A9fices-sur-un-march%C3%A9-sans-entrain"
-
-# print(aawebf.find_tag(URL,"article")[0].text)
-
-# URL = "https://fr.investing.com/news/economy/crash-boursier-et-recession-au-printemps-selon-david-rosenberg-2205503"
-
-# text = aawebf.find_tag(URL,"WYSIWYG articlePage",True,True)
-
-# array = aawebf.find_tag_text(text,"p",True)
-
-# for a in array:
-#     print(a.text)
-
-import Webscrapping.aa_webscrapping_francetvinfo_function as aa_francetvinfo
-
-#print(aa_francetvinfo.get_article_text("https://www.francetvinfo.fr/faits-divers/police/ce-que-l-on-sait-de-la-collision-mortelle-entre-un-adolescent-en-deux-roues-et-une-voiture-de-police-dans-les-yvelines_6048275.html"))
-#print(aa_francetvinfo.get_all_articles())
-
-import Webscrapping.aa_webscrapping_france24_function as aa_france24
-
-#print(aa_france24.get_all_articles())
-
-import Database.aa_global_database_function as aagdbf
-
-#aagdbf.Postgres_db("localhost","PlottingMate","plottingmate_administrator","Pcc2S47AF8spb2",5432)
-
-import Database.aa_local_database_function as aaldbf
+def send_email():
+    try:
+        data = localdb_f.get_article_to_send_by_email()
+        for article in data:
+            website_id = article[0]
+            name = localdb_f.get_website_name_by_id(website_id)
+            url = article[1]
+            tweet = format_tweet(article[2], name)
+            question = article[3]
+            body = "url : \n" + url + "\n\n\n" + "tweet : \n" + tweet + "\n\n\n" + "question : \n" + question
+            mail_sent = mail_f.send_email(secret["SENDER_EMAIL"], secret["SENDER_PASSWORD"], secret["RECEIVER_EMAIL"], url, body)
+            if(mail_sent):
+                localdb_f.update_email_sent_news_table(url)
+    except Exception as e:
+        print(e)
+        return False
 
 
-#print(aaldbf.reset_tables())
-#print(aaldbf.delete_tables())
-#print(aaldbf.create_tables())
-#aaldbf.insert_row_websites_table("france24","https://www.france24.com/fr/info-en-continu/")
-#print(aaldbf.get_website_id("france24"))
-#aaldbf.insert_row_websites_table("francetvinfo","https://www.francetvinfo.fr/")
+def main():
+    # check if database are good
+    print("----VERIFY DATABASE----")
+    verify_database()
 
-#print(aaldbf.insert_row_news_table("France24","https://www.france24.com/fr/info-en-continu/20230906-wall-street-termine-en-baisse-prises-de-b%C3%A9n%C3%A9fices-sur-un-march%C3%A9-sans-entrain"))
-#print(aaldbf.update_row_news_table("https://www.france24.com/fr/info-en-continu/20230906-wall-street-termine-en-baisse-prises-de-b%C3%A9n%C3%A9fices-sur-un-march%C3%A9-sans-entrain",content="tgztgz",ia_tweet="qfvdfv"))
+    # get article list, parameter is the number of articles to get by website
+    print("----GET ARTICLES----")
+    dict_articles = webscrapping_f.get_all_articles(1)
 
-import Webscrapping.aa_webscrapping_news_function as news_f
+    #  add articles url to database
+    print("----ADD ARTICLES TO DATABASE----")
+    webscrapping_f.add_articles_to_database(dict_articles)
 
-#articles = aawebscrf.get_all_articles()
+    # summarize all questions of all tweets in database
+    print("----SUMMARIZE ALL QUESTIONS----")
+    limit_not_reached = webscrapping_f.summarize_all_questions()
 
-#print(articles)
-#print(aaldbf.row_exists_news_table("https://www.france24.com/fr/info-en-continu/20230906-wtreet-termine-en-baisse-prises-de-b%C3%A9n%C3%A9fices-sur-un-march%C3%A9-sans-entrain"))
-articles = news_f.get_all_articles()
-#print(articles)
-#print(str(articles['france24'][0]).strip("{").strip("}").strip("'"))
-#print(aa_france24.get_article_text(str(articles['france24'][0]).strip("{").strip("}").strip("'")))
-#news_f.add_articles_to_database(articles)
+    # if chatgpt limit is not reached, summarize all articles and add in database
+    print("----SUMMARIZE ALL ARTICLES----")
+    if(limit_not_reached):
+        webscrapping_f.summarize_all_articles()
+    else:
+        print("limit reached")
 
-text = aa_france24.get_article_text(str(articles['france24'][0]).strip("{").strip("}").strip("'"))
+    # send email
+    print("----SEND EMAIL----")
+    send_email()
 
-import Common.aa_openai_function as openai_f
-print(openai_f.resume_article_chatgpt(text))
-#print(openai_f.article_category_chatgpt(text))
+
+if __name__ == "__main__":
+    main()
