@@ -22,8 +22,8 @@ Dependencies listed in requirements.txt
 ### Installation
 Clone the repository:
 
-git clone https://github.com/BenjaminDemolin/Agregactus.git
-cd agregactus
+git clone https://github.com/BenjaminDemolin/Agregactus-v1.0.git
+cd Agregactus-v1.0
 
 ### Install dependencies:
 
