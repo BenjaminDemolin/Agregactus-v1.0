@@ -4,8 +4,8 @@ from nltk.probability import FreqDist
 import heapq
 import nltk
 from datetime import datetime, timezone
-import Webscrapping.aa_webscrapping_france24_function as france24_f
-import Webscrapping.aa_webscrapping_francetvinfo_function as francetvinfo_f
+import Webscraping.aa_webscraping_france24_function as france24_f
+import Webscraping.aa_webscraping_francetvinfo_function as francetvinfo_f
 import Database.aa_local_database_function as localdb_f
 import Common.aa_openai_function as openai_f
 
@@ -89,6 +89,14 @@ def summarize_text(text, num_sentences=5):
 
     return ' '.join(summary_sentences)
 
+"""
+    Description:
+        Drop " at the beginning and at the end of a string if it exists
+    Parameters:
+        input_string: string
+    Return:
+        modified_string: string
+"""
 def drop_first_last_character(input_string):
     if input_string[0] == '"' and input_string[-1] == '"':
         modified_string = input_string[1:-1]
@@ -96,6 +104,14 @@ def drop_first_last_character(input_string):
     else:
         return input_string
 
+"""
+    Description:
+        Summarize all articles
+    Parameters:
+        None
+    Return:
+        None
+"""
 def summarize_all_articles():
     try:
         links_articles = localdb_f.get_uncompleted_articles_links()
@@ -113,16 +129,24 @@ def summarize_all_articles():
             current_utc_time = datetime.now(timezone.utc)
             date = int(current_utc_time.timestamp())
             print("- " + tweet)
-            if("Rate limit reached" not in tweet):
+            if(isinstance(tweet, str)):
                 localdb_f.update_tweet_news_table(link,ia_tweet=tweet,date=date)
             else:
-                print("Rate limit reached")
+                print("Rate limit reached - article")
                 return False
         return True
     except Exception as e:
         print(e)
         return e
     
+"""
+    Description:
+        Summarize all tweets
+    Parameters:
+        None
+    Return:
+        None
+"""    
 def summarize_all_questions():
     try:
         articles = localdb_f.get_uncompleted_questions_links()
@@ -131,11 +155,11 @@ def summarize_all_questions():
             link = article[0]
             tweet = article[1]
             question = openai_f.article_question_chatgpt(tweet)
-            print("- " +question)
-            if("Rate limit reached" not in question):
+            print("- " + question)
+            if(isinstance(question, str)):
                 localdb_f.update_question_news_table(link,question=question)
             else:
-                print("Rate limit reached")
+                print("Rate limit reached - question")
                 return False
         return True
     except Exception as e:

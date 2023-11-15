@@ -34,19 +34,10 @@ def create_news_table():
         print(e)
         return False
 
-def create_main_category_table():
-    try:
-        connector.create_table(TABLE_MAIN_CATEGORY_NAME,TABLE_MAIN_CATEGORY_COLUMNS)
-        return True
-    except Exception as e:
-        print(e)
-        return False
-
 def create_tables():
     try:
-        connector.create_table(TABLE_WEBSITES_NAME,TABLE_WEBSITES_COLUMNS)
-        connector.create_table(TABLE_NEWS_NAME,TABLE_NEWS_COLUMNS)
-        connector.create_table(TABLE_MAIN_CATEGORY_NAME,TABLE_MAIN_CATEGORY_COLUMNS)
+        create_websites_table()
+        create_news_table()
         return True
     except Exception as e:
         print(e)
@@ -68,19 +59,10 @@ def reset_news_table():
         print(e)
         return False
 
-def reset_main_category_table():
-    try:
-        connector.reset_table(TABLE_MAIN_CATEGORY_NAME)
-        return True
-    except Exception as e:
-        print(e)
-        return False
-
 def reset_tables():
     try:
-        connector.reset_table(TABLE_WEBSITES_NAME)
-        connector.reset_table(TABLE_NEWS_NAME)
-        connector.reset_table(TABLE_MAIN_CATEGORY_NAME)
+        reset_news_table()
+        reset_websites_table()
         return True
     except Exception as e:
         print(e)
@@ -102,19 +84,10 @@ def delete_news_table():
         print(e)
         return False
 
-def delete_main_category_table():
-    try:
-        connector.delete_table(TABLE_MAIN_CATEGORY_NAME)
-        return True
-    except Exception as e:
-        print(e)
-        return False
-
 def delete_tables():
     try:
-        connector.delete_table(TABLE_WEBSITES_NAME)
-        connector.delete_table(TABLE_NEWS_NAME)
-        connector.delete_table(TABLE_MAIN_CATEGORY_NAME)
+        delete_news_table()
+        delete_websites_table()
         return True
     except Exception as e:
         print(e)
@@ -123,13 +96,6 @@ def delete_tables():
 def insert_row_websites_table(name,url):
     try:
         return connector.insert_row(TABLE_WEBSITES_NAME,"name,url","'%s','%s'" % (name.lower(),url))
-    except Exception as e:
-        print(e)
-        return False
-
-def insert_row_main_category_table(name):
-    try:
-        return connector.insert_row(TABLE_MAIN_CATEGORY_NAME,"name","'%s'" % (name.lower()))
     except Exception as e:
         print(e)
         return False
@@ -169,30 +135,16 @@ def get_website_id_by_name(name):
         print(e)
         return False
 
-def get_main_category_id(name):
-    try:
-        return connector.select_rows(TABLE_MAIN_CATEGORY_NAME,"main_category_id","name = '%s'" % (name.lower()))
-    except Exception as e:
-        print(e)
-        return False
-
-def insert_row_news_table(website_name,url,ia_tweet=None,question=None,main_category=None,date=None):
+def insert_row_news_table(website_name,url,ia_tweet=None,question=None,date=None):
     try:
         website_id = get_website_id_by_name(website_name)[0][0]
         if ia_tweet is None:
             ia_tweet = "NULL"
         if question is None:
             question = "NULL"
-        if main_category is None:
-            main_category = "NULL"
-        else:
-            if(len(get_main_category_id(main_category)) == 0):
-                main_category = "NULL"
-            else:
-                main_category = get_main_category_id(main_category)[0][0]
         if date is None:
             date = "NULL"
-        return connector.insert_row(TABLE_NEWS_NAME,"website_id,url,ia_tweet,question,main_category_id,date","%s,'%s','%s','%s',%s,%s" % (website_id,url,ia_tweet,question,main_category,date))
+        return connector.insert_row(TABLE_NEWS_NAME,"website_id,url,ia_tweet,question,date","%s,'%s','%s','%s',%s" % (website_id,url,ia_tweet,question,date))
     except Exception as e:
         print(e)
         return False
@@ -223,7 +175,6 @@ def update_question_news_table(url,question=None):
     try:
         if question is None:
             question = "NULL"
-        print("question")
         return connector.update_row(TABLE_NEWS_NAME,"question = '%s'" % (question),"url = '%s'" % (url))
     except Exception as e:
         print(e)
@@ -248,13 +199,6 @@ def table_websites_exists():
 def table_news_exists():
     try:
         return connector.check_table_exists(TABLE_NEWS_NAME)
-    except Exception as e:
-        print(e)
-        return False
-    
-def table_main_category_exists():
-    try:
-        return connector.check_table_exists(TABLE_MAIN_CATEGORY_NAME)
     except Exception as e:
         print(e)
         return False

@@ -1,8 +1,8 @@
-import Common.aa_webscrapping_function as webscrapping_f
+import Common.aa_webscraping_function as webscraping_f
 import Database.aa_local_database_function as localdb_f
 
 """
-    File name: aa_webscrapping_francetvinfo_function.py
+    File name: aa_webscraping_francetvinfo_function.py
     Description: This file contains functions to extract data from francetvinfo website
 """
 
@@ -19,7 +19,7 @@ import Database.aa_local_database_function as localdb_f
 def get_all_articles(num_articles=20):
     try:
         url = localdb_f.get_website_url_by_name("francetvinfo")
-        return webscrapping_f.get_articles_links(url,"article")[:num_articles]
+        return webscraping_f.get_articles_links(url,"article")[:num_articles]
     except Exception as e:
         print(e)
         return e
@@ -34,10 +34,10 @@ def get_all_articles(num_articles=20):
 """
 def get_article_text(url):
     try:
-        titre = webscrapping_f.find_tag(url,".c-title")[0].text
-        intro = webscrapping_f.find_tag(url,".c-chapo")[0].text
-        corps = webscrapping_f.find_tag(url,".c-body")[0].text
-        return titre + "\n" + intro + "\n" + corps
+        article = webscraping_f.get_text_from_tag(url,".c-title") + "\n"
+        article += webscraping_f.get_text_from_tag(url,".c-chapo") + "\n"
+        article += webscraping_f.get_text_from_tag(url,".c-body") + "\n"
+        return article
     except Exception as e:
         print(e)
         return e

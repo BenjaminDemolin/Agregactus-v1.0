@@ -7,7 +7,17 @@ from email.mime.multipart import MIMEMultipart
     Description: This file contains email functions 
 """
 
-def send_email(sender_email, sender_password, receiver_email, subject, body):
+"""
+    Description: Send an email using Gmail
+    Parameters:
+        sender_email: Sender's email
+        sender_password: Sender's password
+        receiver_email: Receiver's email
+        subject: Email's subject
+        body: Email's body
+    Return: True if the email is sent, False otherwise
+"""
+def send_email_gmail(sender_email, sender_password, receiver_email, subject, body):
     try:
         # Create the email message
         message = MIMEMultipart()

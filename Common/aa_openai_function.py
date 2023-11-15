@@ -24,7 +24,7 @@ openai.api_key = secret["OPENAI_API_KEY"]
     Return:
         chatgpt_content: string
 """
-def openai_request(content, role="system", model="gpt-3.5-turbo", temperature=0, max_tokens=256, top_p=1, frequency_penalty=0, presence_penalty=0):
+def openai_request(content, role="system", model="gpt-3.5-turbo", temperature=0.5, max_tokens=200, top_p=1, frequency_penalty=0, presence_penalty=0):
     try:
         response = openai.ChatCompletion.create(
         model=model,
@@ -43,6 +43,8 @@ def openai_request(content, role="system", model="gpt-3.5-turbo", temperature=0,
         chatgpt_content = ""
         if(len(response['choices']) > 0):
             chatgpt_content = str(response['choices'][0]['message']['content']).replace("'", "''")
+            if(chatgpt_content[0] == '"'):
+                chatgpt_content = chatgpt_content.replace('"', "")
         return chatgpt_content
     except Exception as e:
         print(e)
@@ -58,26 +60,11 @@ def openai_request(content, role="system", model="gpt-3.5-turbo", temperature=0,
 """
 def article_to_tweet_chatgpt(article):
     try:
-        return openai_request(content="Fait un tweet percutent a partir de l'article suivant, ne met pas de \" au tweet : \n" + article)
+        return openai_request(content="Fait un tweet court et percutent en français en restant neutre à partir de l'article suivant : \n" + article)
     except Exception as e:
         print(e)
         return e
-    
-"""
-    Description:
-        Use chatgpt to categorize a given article
-    Parameters:
-        article: string
-    Return:
-        response: string
-"""
-def article_category_chatgpt(article):
-    try:
-        return openai_request(article + "\n\nclassifie le tweet dans un de ces types: actualités nationales et internationales, économie, culture, science, sports, environnement , faits divers, santé, technologie, politique. Retourne juste le type en réponse")
-    except Exception as e:
-        print(e)
-        return e
-    
+        
 """
     Description:
         Use chatgpt to generate a question from a given article

@@ -15,23 +15,28 @@ Agregactus is your go-to tool for effortlessly staying informed and sharing summ
 ## Getting Started
 
 ### Prerequisites
-Python 3.x
-PostgreSQL
-Dependencies listed in requirements.txt
+Python 3.x  
+PostgreSQL (can use Docker image)  
+Dependencies listed in requirements.txt  
 
 ### Installation
 Clone the repository:
 
+```bash
 git clone https://github.com/BenjaminDemolin/Agregactus-v1.0.git
 cd Agregactus-v1.0
-
-### Install dependencies:
-
-
 pip install -r requirements.txt
+```
 
-Configure your .env. See .env.example for an example.
+### Env file configuration
 
+Create a .env file in the root directory of the project and fill it with the following information:
+
+```bash
+DB_HOST|DB_NAME|DB_USER|DB_PASSWORD|DB_PORT = PostgreSQL database information.
+OPENAI_API_KEY = OpenAI API key (https://platform.openai.com/api-keys).
+EMAIL_SENDER_ADDRESS|EMAIL_SENDER_PASSWORD|EMAIL_RECEIVER_ADDRESS = Email information.
+```
 
 ### Run Agregactus:
 
