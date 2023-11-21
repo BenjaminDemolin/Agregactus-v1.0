@@ -1,4 +1,7 @@
 import psycopg2
+from psycopg2 import OperationalError
+from retry import retry
+import time
 
 """
     File name: aa_global_database_function.py
@@ -16,11 +19,17 @@ class Postgres_db:
     ##################
 
     def __init__(self, host, dbname, user, password, port):
-        try:
-            self.connection = psycopg2.connect(host=host, dbname=dbname, user=user, password=password, port=port)
-            self.cursor = self.connection.cursor()
-        except Exception as e:
-            return e
+        self.connection = None
+        max_attempts = 10
+        attempts = 0
+        while not self.connection and attempts < max_attempts:
+            try:
+                self.connection = psycopg2.connect(host=host, dbname=dbname, user=user, password=password, port=port)
+            except OperationalError as e:
+                print(e)
+                time.sleep(5)
+                attempts += 1
+        self.cursor = self.connection.cursor()
 
 
     ##################

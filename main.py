@@ -1,15 +1,10 @@
-from dotenv import dotenv_values
+import Common.aa_global_variable as global_var
 import Database.aa_local_database_function as localdb_f
 import Webscraping.aa_webscraping_news_function as webscraping_f
 import Common.aa_mail_function as mail_f
 import datetime as dt
 import time
 
-secret = dotenv_values(".env")
-
-email_address = secret["EMAIL_SENDER_ADDRESS"]
-email_password = secret["EMAIL_SENDER_PASSWORD"]
-receiver_email = secret["EMAIL_RECEIVER_ADDRESS"]
 
 """
     File name: main.py
@@ -55,6 +50,9 @@ def format_tweet(tweet, source):
 def send_email():
     try:
         data = localdb_f.get_article_to_send_by_email()
+        email_address = global_var.load_var("EMAIL_SENDER_ADDRESS")
+        email_password = global_var.load_var("EMAIL_SENDER_PASSWORD")
+        receiver_email = global_var.load_var("EMAIL_RECEIVER_ADDRESS")
         for article in data:
             website_id = article[0]
             name = localdb_f.get_website_name_by_id(website_id)
@@ -87,7 +85,7 @@ def main():
         # get article list, parameter is the number of articles to get by website
         print("----GET ARTICLES----")
         dict_articles = webscraping_f.get_all_articles(1)
-
+        
         #  add articles url to database
         print("----ADD ARTICLES TO DATABASE----")
         webscraping_f.add_articles_to_database(dict_articles)

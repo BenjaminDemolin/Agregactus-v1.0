@@ -4,11 +4,11 @@ from Common.aa_global_variable import *
 
 secret = dotenv_values("./.env")
 
-host = secret["DB_HOST"]
-dbname = secret["DB_NAME"]
-user = secret["DB_USER"]
-password = secret["DB_PASSWORD"]
-port = secret["DB_PORT"]
+host = load_var("DB_HOST")
+dbname = load_var("DB_NAME")
+user = load_var("DB_USER") 
+password = load_var("DB_PASSWORD") 
+port = load_var("DB_PORT")
 
 
 """

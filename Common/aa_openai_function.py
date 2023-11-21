@@ -1,8 +1,9 @@
 import openai
 from dotenv import dotenv_values
+import Common.aa_global_variable as global_var
 
 secret = dotenv_values("./.env")
-openai.api_key = secret["OPENAI_API_KEY"]
+openai.api_key = global_var.load_var("OPENAI_API_KEY")
 
 """
     File name: aa_openai_function.py

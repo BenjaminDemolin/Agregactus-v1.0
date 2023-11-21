@@ -38,6 +38,14 @@ OPENAI_API_KEY = OpenAI API key (https://platform.openai.com/api-keys).
 EMAIL_SENDER_ADDRESS|EMAIL_SENDER_PASSWORD|EMAIL_RECEIVER_ADDRESS = Email information.
 ```
 
+### Use Docker 
+
+Use docker-compose to run the project:
+```bash
+docker-compose up -d
+```
+You have to change the password, api key and email address in the docker-compose.yml file to match the one in the .env file.
+
 ### Run Agregactus:
 
 python main.py
